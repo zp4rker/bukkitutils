@@ -8,6 +8,10 @@
     <artifactId>bukkitutils</artifactId>
     <version>1.0.0</version>
 
+    <properties>
+        <github.global.server>github</github.global.server>
+    </properties>
+
     <repositories>
         <repository>
             <id>spigotmc</id>
