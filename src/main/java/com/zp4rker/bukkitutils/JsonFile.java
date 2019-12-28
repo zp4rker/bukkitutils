@@ -2,6 +2,7 @@ package com.zp4rker.bukkitutils;
 
 import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -57,4 +58,42 @@ public class JsonFile extends JSONObject {
         return bs.asCharSource(Charset.defaultCharset()).read();
     }
 
+    @Override
+    public Object get(String key) throws JSONException {
+        if (key == null) throw new JSONException("Null key.");
+
+        if (!key.contains(".")) return super.get(key);
+
+        String[] parts = key.split("\\.");
+        JSONObject parent = optJSONObject(parts[0]);
+
+        for (int i = 1; i < parts.length - 1; i++) {
+            if (parent == null) throw new JSONException("JSONObject[" + quote(key) + "] not found.");
+
+            parent = parent.optJSONObject(parts[i]);
+        }
+
+        return parent.opt(parts[parts.length - 1]);
+    }
+
+    public void putValue(String key, Object value) throws JSONException {
+        if (key == null) throw new JSONException("Null key.");
+
+        if (!key.contains(".")) {
+            super.put(key, value);
+            return;
+        }
+
+        String[] parts = key.split("\\.");
+        if (!has(parts[0])) put(parts[0], new JSONObject());
+        JSONObject parent = optJSONObject(parts[0]);
+
+        for (int i = 1; i < parts.length - 1; i++) {
+            if (!parent.has(parts[i])) parent.put(parts[i], new JSONObject());
+
+            parent = parent.optJSONObject(parts[i]);
+        }
+
+        if (!parent.has(parts[parts.length - 1])) parent.put(parts[parts.length - 1], value);
+    }
 }
