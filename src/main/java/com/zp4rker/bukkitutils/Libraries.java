@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Arrays;
 
 public class Libraries {
 
@@ -14,6 +15,16 @@ public class Libraries {
         Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
         method.setAccessible(true);
         method.invoke(cl, file.toURI().toURL());
+    }
+
+    public static void addLibraries(File... files) {
+        Arrays.stream(files).forEach(lib -> {
+            try {
+                addLibrary(lib);
+            } catch (MalformedURLException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
+                System.out.println("FAILED TO ADD LIBRARIES TO CLASSPATH");
+            }
+        });
     }
 
 }
