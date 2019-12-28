@@ -1,12 +1,7 @@
 package com.zp4rker.bukkitutils;
 
-import com.google.common.io.ByteStreams;
-
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
-import java.nio.file.Files;
 
 public class KotlinRuntime {
 
@@ -19,25 +14,17 @@ public class KotlinRuntime {
         }
     }
 
-    public static File[] loadLibraries(String version) throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        String coreUrl = "https://repo1.maven.org/maven2/org/jetbrains/kotlin/kotlin-stdlib/$version/kotlin-stdlib-$version.jar".replace("$version", version);
-        String jdk8Url = "https://repo1.maven.org/maven2/org/jetbrains/kotlin/kotlin-stdlib-jdk8/$version/kotlin-stdlib-jdk8-$version.jar".replace("$version", version);
-
-        return new File[] {downloadLibrary(coreUrl, "kotlin-stdlib-" + version + ".jar"), downloadLibrary(jdk8Url, "kotlin-stdlib-jdk8-" + version + ".jar")};
+    public static File[] loadLibraries(String version) throws IOException {
+        if (librariesPresent(version)) return new File[] {new File("./libs/kotlin-stdlib-" + version + ".jar"), new File("./libs/kotlin-stdlib-jdk8-" + version + ".jar")};
+        String groupId = "org.jetbrains.kotlin";
+        return new File[] {Libraries.downloadFromCentral(groupId, "kotlin-stdlib", version), Libraries.downloadFromCentral(groupId, "kotlin-stdlib-jdk8", version)};
     }
 
-    private static File downloadLibrary(String link, String name) throws IOException {
-        URL url = new URL(link);
-        File file = new File("./libs/" + name);
+    private static boolean librariesPresent(String version) {
+        File core = new File("./libs/kotlin-stdlib-" + version + ".jar");
+        File jdk8 = new File("./libs/kotlin-stdlib-jdk8-" + version + ".jar");
 
-        if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
-        if (file.exists()) return file;
-        else file.createNewFile();
-
-        byte[] bytes = ByteStreams.toByteArray(url.openStream());
-        Files.write(file.toPath(), bytes);
-
-        return file;
+        return core.exists() && jdk8.exists();
     }
 
 }
