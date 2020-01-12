@@ -1,9 +1,22 @@
 package com.zp4rker.bukkitutils;
 
+import org.bukkit.plugin.java.JavaPlugin;
+
 import java.io.File;
 import java.io.IOException;
 
 public class KotlinRuntime {
+
+    public static void setup(JavaPlugin plugin, String kotlinVersion) throws IOException {
+        if (loaded()) return;
+
+        plugin.getLogger().info("Kotlin runtime not found! Fetching libraries...");
+        File[] libs = loadLibraries(kotlinVersion);
+        plugin.getLogger().info("Successfully fetched libraries! Loading Kotlin runtime...");
+        Libraries.addLibraries(libs);
+
+        if (loaded()) plugin.getLogger().info("Successfully loaded Kotlin runtime!");
+    }
 
     public static boolean loaded() {
         try {
